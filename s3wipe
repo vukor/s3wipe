@@ -58,6 +58,11 @@ def getArgs():
         help="If S3 path is a bucket path, delete the bucket also",
         action='store_true')
 
+    parser.add_argument("--region", 
+        help="Region of target S3 bucket. Default vaue `us-east-1`",
+        required=False,
+        default='us-east-1')
+
     return parser.parse_args()
 
 
@@ -93,7 +98,8 @@ def loggerSetup(args):
 def deleter(args, rmQueue, numThreads):
 
     # Set up per-thread boto objects
-    myconn = boto.s3.connection.S3Connection(                                  
+    myconn = boto.s3.connect_to_region(
+        args.region,                                 
         aws_access_key_id=args.id,
         aws_secret_access_key=args.key)
     bucket, path = args.path
@@ -143,7 +149,8 @@ def listInit(arg1, arg2):
 def lister(subDir):
 
     # Set up our per-thread boto connection
-    myconn = boto.s3.connection.S3Connection(                                  
+    myconn = boto.s3.connect_to_region(
+        args.region,                                 
         aws_access_key_id=args.id,
         aws_secret_access_key=args.key)
     bucket, path = args.path
@@ -181,7 +188,8 @@ def main():
 
     # Our main boto object.  Really only used to start the
     # watcher threads on a per-subdir basis
-    conn = boto.s3.connection.S3Connection(                                  
+    conn = boto.s3.connect_to_region(
+        args.region,                                  
         aws_access_key_id=args.id,
         aws_secret_access_key=args.key)
 
