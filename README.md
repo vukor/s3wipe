@@ -47,14 +47,14 @@ _or_
 
 Then:
 
-    wget https://raw.github.com/eschwim/s3wipe/master/s3wipe
+    wget https://raw.github.com/ravitejaobelisk/s3wipe/master/s3wipe
     chmod 755 s3wipe
 
 ### Using Docker
 
 Clone the repo:
 
-    git clone git@github.com:eschwim/s3wipe.git
+    git clone git@github.com:ravitejaobelisk/s3wipe.git
     cd s3wipe
 
 Build the Docker image:
@@ -83,6 +83,7 @@ optional arguments:
   --batchsize BATCHSIZE  # of keys to batch delete (default 100)
   --maxqueue MAXQUEUE    Max size of deletion queue (default 10k)
   --delbucket            If S3 path is a bucket path, delete the bucket also
+  --region               Region of target S3 bucket. Default vaue `us-east-1`
 
 ```
 
