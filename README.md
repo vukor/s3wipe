@@ -89,6 +89,11 @@ optional arguments:
 
 ## Changelog
 
+_v0.3_
+
+    Put everything together so that it's on docker hub and linked to the src
+    on github.
+
 _v0.2_
 
     You can now delete all keys under an arbitrary S3 path, instead of only
@@ -97,3 +102,8 @@ _v0.2_
 _v0.1_
 
     Initial version.
+    
+## References
+- https://cloud.docker.com/u/slmingol/repository/docker/slmingol/s3wipe
+- [How do I delete a versioned bucket in AWS S3 using the CLI?
+](https://stackoverflow.com/questions/29809105/how-do-i-delete-a-versioned-bucket-in-aws-s3-using-the-cli/54778540#54778540)
