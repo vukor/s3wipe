@@ -47,14 +47,14 @@ _or_
 
 Then:
 
-    wget https://raw.github.com/ravitejaobelisk/s3wipe/master/s3wipe
+    wget https://raw.github.com/slmingol/s3wipe/master/s3wipe
     chmod 755 s3wipe
 
 ### Using Docker
 
 Clone the repo:
 
-    git clone git@github.com:ravitejaobelisk/s3wipe.git
+    git clone git@github.com:slmingol/s3wipe.git
     cd s3wipe
 
 Build the Docker image:
