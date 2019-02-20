@@ -87,6 +87,24 @@ optional arguments:
 
 ```
 
+## Example run
+
+**NOTE:** The below will automatically pull the container from Github prior to executing it if you don't already have it.
+
+```
+$ docker run -it --rm slmingol/s3wipe \
+   --id $(aws configure get default.aws_access_key_id) \
+   --key $(aws configure get default.aws_secret_access_key) \
+   --path s3://bw-tf-backends-aws-example-logs \
+   --delbucket
+[2019-02-20@03:58:33] INFO: Deleting from bucket: bw-tf-backends-aws-example-logs, path: None
+[2019-02-20@03:58:33] INFO: Getting subdirs to feed to list threads
+[2019-02-20@03:58:35] INFO: Starting 2 delete threads...
+[2019-02-20@03:58:35] INFO: Starting 1 list threads...
+[2019-02-20@03:58:37] INFO: Done deleting keys
+[2019-02-20@03:58:37] INFO: Bucket is empty.  Attempting to remove bucket
+```
+
 ## Changelog
 
 _v0.3_
