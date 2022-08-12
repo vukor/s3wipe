@@ -209,7 +209,7 @@ def main():
     deleteThreads = listThreads*2
 
     # Now start all of our delete & list threads
-    if click.confirm("Do you want to start %s threads to remove object versions in the %s/%s bucket?" % (deleteThreads,bucket,path)):
+    if click.confirm("Do you want to start %s threads to remove object versions in the s3://%s/%s bucket?" % (deleteThreads,bucket,path)):
         if listThreads > 0:
             # Limit number of threads to specific maximum.
             if (listThreads + deleteThreads) > args.maxthreads:
