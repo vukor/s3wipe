@@ -4,12 +4,13 @@ import argparse, Queue, logging, random, sys
 import multiprocessing, signal, re
 from multiprocessing.pool import ThreadPool
 import boto.s3.connection
+import click
 
 version = "0.2"
 
 # Make sure we have a semi-recent version of boto installed
 try:
-    import boto.s3.connection                                  
+    import boto.s3.connection
     if tuple(map(int, boto.__version__.split("."))) < (2,5,2): 
         raise Exception
 except:
@@ -19,7 +20,7 @@ except:
 # Format specifier for our S3 object
 def s3Path(path):
 
-    match = re.match('s3://([^/]+)(?:/([^/]+(?:/[^/]+)*))?$', path)
+    match = re.match('s3://([^/]+)/(.+)$', path)
     if match:
         return match.groups()
     else:
@@ -189,7 +190,7 @@ def main():
     # Our main boto object.  Really only used to start the
     # watcher threads on a per-subdir basis
     conn = boto.s3.connect_to_region(
-        args.region,                                  
+        args.region,
         aws_access_key_id=args.id,
         aws_secret_access_key=args.key)
 
@@ -201,8 +202,6 @@ def main():
         logger.error(shortErr)
         sys.exit(1)
 
-    mybucket.configure_versioning(True)
-
     # Poll the root-level directories in the s3 bucket, and
     # start a reader process for each one of them
     subDirs = list(mybucket.list_versions(prefix=path, delimiter="/"))
@@ -210,27 +209,28 @@ def main():
     deleteThreads = listThreads*2
 
     # Now start all of our delete & list threads
-    if listThreads > 0:
-        # Limit number of threads to specific maximum.
-        if (listThreads + deleteThreads) > args.maxthreads:
-            listThreads = args.maxthreads / 3
-            deleteThreads = args.maxthreads - listThreads
-        
-        logger.info("Starting %s delete threads..." % deleteThreads)
-        deleterPool = ThreadPool(processes=deleteThreads, 
-            initializer=deleter, initargs=(args, rmQueue, deleteThreads))
+    if click.confirm(f"Do you want to start {deleteThreads} threads to remove object versions in the s3://{bucket}/{path} bucket?"):
+        if listThreads > 0:
+            # Limit number of threads to specific maximum.
+            if (listThreads + deleteThreads) > args.maxthreads:
+                listThreads = args.maxthreads / 3
+                deleteThreads = args.maxthreads - listThreads
 
-        logger.info("Starting %s list threads..." % listThreads)
-        listerPool = ThreadPool(processes=listThreads, 
-            initializer=listInit, initargs=(args, rmQueue))
+            logger.info("Starting %s delete threads..." % deleteThreads)
+            deleterPool = ThreadPool(processes=deleteThreads, 
+                initializer=deleter, initargs=(args, rmQueue, deleteThreads))
 
-        # Feed the root-level subdirs to our listing process, which
-        # will in-turn populate the deletion queue, which feed the
-        # deletion threads
-        listerPool.map(lister, subDirs)
-        rmQueue.join()
+            logger.info("Starting %s list threads..." % listThreads)
+            listerPool = ThreadPool(processes=listThreads, 
+                initializer=listInit, initargs=(args, rmQueue))
 
-    logger.info("Done deleting keys")
+            # Feed the root-level subdirs to our listing process, which
+            # will in-turn populate the deletion queue, which feed the
+            # deletion threads
+            listerPool.map(lister, subDirs)
+            rmQueue.join()
+
+        logger.info("Done deleting keys")
 
     if args.delbucket and path is None:
         if list(mybucket.list_versions(delimiter='/')):
